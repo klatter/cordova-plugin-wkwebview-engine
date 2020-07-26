@@ -1,0 +1,53 @@
+{
+  "_from": "@mendix/cordova-plugin-wkwebview-engine@1.0.3-mx.1.2.3",
+  "_id": "@mendix/cordova-plugin-wkwebview-engine@1.0.3-mx.1.2.3",
+  "_inBundle": false,
+  "_integrity": "sha512-xHnOVWMOsBFjud8KcematK6IxD2Ek0YdxZ07Tp0K7TnneFmcolBoheZFRbxavjc0gbqAZVheyvLY4j632gkhYQ==",
+  "_location": "/@mendix/cordova-plugin-wkwebview-engine",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@mendix/cordova-plugin-wkwebview-engine@1.0.3-mx.1.2.3",
+    "name": "@mendix/cordova-plugin-wkwebview-engine",
+    "escapedName": "@mendix%2fcordova-plugin-wkwebview-engine",
+    "scope": "@mendix",
+    "rawSpec": "1.0.3-mx.1.2.3",
+    "saveSpec": null,
+    "fetchSpec": "1.0.3-mx.1.2.3"
+  },
+  "_requiredBy": [
+    "#DEV:/",
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/@mendix/cordova-plugin-wkwebview-engine/-/cordova-plugin-wkwebview-engine-1.0.3-mx.1.2.3.tgz",
+  "_shasum": "98f67600ee079226cd0ebe9e208435c7320ea671",
+  "_spec": "@mendix/cordova-plugin-wkwebview-engine@1.0.3-mx.1.2.3",
+  "_where": "/Users/nkl21615/Documents/sandbox/mobile/phonegap2/build",
+  "author": {
+    "name": "Apache Cordova"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Mendix B.V"
+    }
+  ],
+  "deprecated": false,
+  "description": "Cordova WKWebView Engine Plugin (Mendix fork)",
+  "devDependencies": {
+    "jshint": "^2.6.0"
+  },
+  "keywords": [
+    "cordova",
+    "wkwebview"
+  ],
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "name": "@mendix/cordova-plugin-wkwebview-engine",
+  "scripts": {
+    "jshint": "node node_modules/jshint/bin/jshint src",
+    "test": "npm run jshint"
+  },
+  "version": "1.0.3-mx.1.2.3"
+}
