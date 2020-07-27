@@ -32,6 +32,8 @@
 {
     NSOperationQueue *fileQueue;
     NSURLSession *urlSession;
+    NSString* certificate;
+    NSString*  password;
     NSString* certificatePath;
     NSString* certificatePassword;
 }
@@ -324,6 +326,19 @@ NSTimer *timer;
     wkWebView.configuration.mediaPlaybackRequiresUserAction = [settings cordovaBoolSettingForKey:@"MediaPlaybackRequiresUserAction" defaultValue:YES];
     wkWebView.configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     wkWebView.configuration.mediaPlaybackAllowsAirPlay = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
+    
+    // Load cordova settings
+    certificate = [settings cordovaSettingForKey:@"WKWebviewCertificatePath"];
+    if (!certificate) {
+        // Fallback to the UIWebView-named preference
+        certificate = @"/www/cert/clientcertificate.p12";
+    }
+   password = [settings cordovaSettingForKey:@"WKWebviewCertificatePassword"];
+    if (!password) {
+        // Fallback to the UIWebView-named preference
+        password = @"password";
+    }
+
 
 
     // By default, DisallowOverscroll is false (thus bounce is allowed)
@@ -830,11 +845,9 @@ NSTimer *timer;
 
 - (void)sendClientCertificate:(NSURLAuthenticationChallenge *)challenge
           completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable credential))completionHandler {
-    NSString* certificate = @"/cert/clientcertificate.p12";
-    NSString* password = @"prorail";
 
     //check certificate path
-    NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:[NSString stringWithFormat:@"/www%@", certificate]];
+    NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:[NSString stringWithFormat:certificate]];
     NSData *data = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:path]];
     NSURLCredential *credential = [self credentialFromData:data withPassword:password];
     if(credential == nil) {
@@ -882,8 +895,5 @@ NSTimer *timer;
         return nil;
     }
 }
-
-
-
 
 @end
