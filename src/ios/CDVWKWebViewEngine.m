@@ -887,4 +887,3 @@ NSTimer *timer;
 
 
 @end
-vis
