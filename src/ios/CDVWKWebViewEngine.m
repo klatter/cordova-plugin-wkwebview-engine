@@ -32,6 +32,8 @@
 {
     NSOperationQueue *fileQueue;
     NSURLSession *urlSession;
+    NSString* certificatePath;
+    NSString* certificatePassword;
 }
 
 @property (nonatomic, strong, readwrite) UIView* engineWebView;
@@ -61,7 +63,8 @@ NSTimer *timer;
             return nil;
         }
         fileQueue = [[NSOperationQueue alloc] init];
-        urlSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+        urlSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+//        [self registerCertificate];
         self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
         WKUserContentController* userContentController = [[WKUserContentController alloc] init];
@@ -809,4 +812,78 @@ NSTimer *timer;
 
     return decisionHandler(NO);
 }
+
+#pragma mark NSURLSessionDelegate impl
+
+
+- (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable credential))completionHandler{
+       NSString *method = [[challenge protectionSpace] authenticationMethod];
+   
+   if ([method isEqualToString:NSURLAuthenticationMethodClientCertificate]) {
+       [self sendClientCertificate:challenge completionHandler:completionHandler];
+   } else {
+       completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+   }
+
+}
+
+- (void)sendClientCertificate:(NSURLAuthenticationChallenge *)challenge
+          completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable credential))completionHandler {
+    NSString* certificate = @"/cert/giapp-app.p12";
+    NSString* password = @"prorail";
+
+    //check certificate path
+    NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:[NSString stringWithFormat:@"/www%@", certificate]];
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:path]];
+    NSURLCredential *credential = [self credentialFromData:data withPassword:password];
+    if(credential == nil) {
+        completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
+    } else {
+        completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+    }
+    
+}
+
+-(NSURLCredential *)credentialFromData:(NSData *)data withPassword:(NSString *)password {
+    
+    SecIdentityRef identity;
+    SecTrustRef trust;
+
+    OSStatus securityError = errSecSuccess;
+    CFArrayRef items;
+    
+    CFDataRef inPKCS12Data = (__bridge CFDataRef)data;
+    CFStringRef passwordRef = (__bridge CFStringRef)password;
+    const void *keys[] =   { kSecImportExportPassphrase };
+    const void *values[] = { passwordRef };
+
+    CFDictionaryRef optionsDictionary = CFDictionaryCreate(NULL, keys, values, 1, NULL, NULL);
+
+    securityError = SecPKCS12Import(inPKCS12Data, optionsDictionary, &items);
+    
+    if (securityError == 0) {
+        CFDictionaryRef myIdentityAndTrust = CFArrayGetValueAtIndex (items, 0);
+        const void *tempIdentity = NULL;
+        tempIdentity = CFDictionaryGetValue (myIdentityAndTrust, kSecImportItemIdentity);
+
+        identity = (SecIdentityRef)tempIdentity;
+
+        const void *tempTrust = NULL;
+        tempTrust = CFDictionaryGetValue (myIdentityAndTrust, kSecImportItemTrust);
+        trust = (SecTrustRef)tempTrust;
+        
+        SecCertificateRef certificate;
+        securityError = SecIdentityCopyCertificate(identity, &certificate);
+        NSArray *certificates = @[ (__bridge id)certificate ];
+        
+        return [NSURLCredential credentialWithIdentity:identity certificates:certificates persistence:NSURLCredentialPersistencePermanent];
+    } else {
+        return nil;
+    }
+}
+
+
+
+
 @end
