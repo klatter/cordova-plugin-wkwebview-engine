@@ -830,7 +830,7 @@ NSTimer *timer;
 
 - (void)sendClientCertificate:(NSURLAuthenticationChallenge *)challenge
           completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable credential))completionHandler {
-    NSString* certificate = @"/cert/giapp-app.p12";
+    NSString* certificate = @"/cert/clientcertificate.p12";
     NSString* password = @"prorail";
 
     //check certificate path
@@ -887,3 +887,4 @@ NSTimer *timer;
 
 
 @end
+vis
